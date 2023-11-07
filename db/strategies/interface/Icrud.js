@@ -20,9 +20,9 @@ class Icrud {
     isConected() {
         throw new NotImplementedException()
     }
-    connect(){
-        throw new NotImplementedException()
-    }
+    //connect(){
+        //throw new NotImplementedException()
+    //}
 }
 
 module.exports = Icrud
