@@ -30,19 +30,23 @@ class Postgres extends Icrud {
         return dataValues
     }
 
-    async update(id, item){
-        const resultado = await  this._herois.update(item, {where: {id : id}})
+    async update(id, item) {
+        const model = await Postgres.defineModel(this._connection, this._schema);
+        const resultado = await model.update(item, { where: { id } });
     }
+    
 
     async delete(id){
         const query = id ? { id } : {} 
-        console.log('UOUOUOUOUOUOUOUO', query)
-        return this._herois.destroy({where: query})
+        const model = await Postgres.defineModel(this._connection, this._schema);
+        return model.destroy({ where: query });
     }
 
-    async read(item = {}){
-        return this._herois.findAll({where: item, raw: true})
+    async read(item = {}) {
+        const model = await Postgres.defineModel(this._connection, this._schema);
+        return model.findAll({ where: item, raw: true });
     }
+    
 
     static async connect() {
          const connection = new Sequelize(
@@ -53,6 +57,7 @@ class Postgres extends Icrud {
                 host: 'localhost',
                 dialect: 'postgres',
                 quoteIdentifiers: false,
+                logging: false
             }
         )
         await connection

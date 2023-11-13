@@ -44,7 +44,7 @@ class MongoDB extends Icrud {
     return this._schema.create(item)
   }
   //o skip ira pular os 10 ou mais primeiros resultados do banco de dados
-  read(item, skip=0, limit=10){
+  read(item, skip=3, limit=3){
     return this._schema.find(item).skip(skip).limit(limit)
   }
 
@@ -60,5 +60,6 @@ class MongoDB extends Icrud {
 
 module.exports = {
   MongoDB, // Export a class
-  isConnected: MongoDB.isConnected // Export the isConnected function
+  isConnected: MongoDB.isConnected, // Export the isConnected function
+  connect: MongoDB.connect, // Export the connect function
 };

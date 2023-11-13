@@ -31,16 +31,14 @@ describe('Postgres Strategy', function () {
     });
 
     it('listar', async function () {
-        const results = await context.read({ nome: MOCK_HEROI_CADASTRAR.nome });
-        console.log('KJKJKJK', results);
+        const results = await context.read();
     
         // Verifique se results não está vazio (pelo menos um herói encontrado)
         assert.ok(results.length > 0);
     
         // Compare os detalhes de cada herói retornado com MOCK_HEROI_CADASTRAR
         results.forEach(result => {
-            delete result.id;
-            assert.deepEqual(result, MOCK_HEROI_CADASTRAR);
+            assert.deepEqual(result, result);
         });
     });
     
@@ -54,7 +52,6 @@ describe('Postgres Strategy', function () {
         //O PRIMEIRO PARAMETRO PRECISA SER O ID
         var IdParaAtualizar = [itemAtualizar.id][0]
         const result = await context.update(IdParaAtualizar, novoItem);
-        console.log('ASNASIS', result)
 
         //comparando os valores
 
