@@ -1,46 +1,167 @@
 const assert = require('assert');
-const api = require('./../api');
-let app = {};
+const app = require('../api')
+const http = require('http');
 
-async function startServer() {
-    app = await api();
-}
+
 
 describe('Suite de testes da API heroes', function () {
-    before(async () => {
-        await startServer();
-    });
 
-    it('Listar /herois', async () => {
-        const result = await app.inject({
-            method: 'GET',
-            url: '/herois?skip=0&limit=10'
+    it('Deve retornar uma lista de 3 herois', (done) => {
+        http.get('http://localhost:8030/herois?skip=0&limit=3', (res) => {
+          let data = '';
+          res.on('data', (chunk) => {
+            data += chunk;
+          });
+    
+          res.on('end', () => {
+            const responseBody = JSON.parse(data);
+
+            assert.equal(responseBody.length, 3)
+            done();
+          });
         });
-        const dados = JSON.parse(result.payload);
-        const statusCode = result.statusCode;
-        console.log('RESULTADO', result);
-        assert.equal(statusCode, 200);
-    });
+      });
 
-    it('listar /herois - deve retornar um erro com limit incorreto', async () => {
-        const TAMANHO_LIMITE = 'AEEE';
-        const result = await app.inject({
-            method: 'GET',
-            url: `/herois?skip=0&limit=${TAMANHO_LIMITE}`
+
+
+      it('deve retornar um erro com limit incorreto', (done) => {
+        http.get('http://localhost:8030/herois?skip=0&limit=sd', (res) => {
+          let data = '';
+          res.on('data', (chunk) => {
+            data += chunk;
+          });
+    
+          res.on('end', () => {
+            const responseBody = JSON.parse(data);
+            assert.equal(responseBody.statusCode, 500)
+            done();
+          });
         });
-        assert.equal(result.payload, 'Error interno no servidor');
-    });
+      });
 
-    it('listar /herois - deve filtrar um item', async () => {
-        const NAME = 'Demons';
-        const result = await app.inject({
-            method: 'GET',
-            url: `/herois?skip=0&limit=1000&nome=${NAME}`
+
+      it('deve retornar um erro com skip incorreto', (done) => {
+        http.get('http://localhost:8030/herois?skip=ERROR&limit=1000', (res) => {
+          let data = '';
+          res.on('data', (chunk) => {
+            data += chunk;
+          });
+    
+          res.on('end', () => {
+            const responseBody = JSON.parse(data);
+            assert.equal(responseBody.statusCode, 500)
+            done();
+          });
         });
+      });
 
-        const dados = JSON.parse(result.payload);
-        const statusCode = result.statusCode;
-        assert.equal(statusCode, 200);
-        assert.strictEqual(dados[0].nome, NAME);
-    });
+
+      it('Deve filtrar um item', (done) => {
+        var NAME = 'Pernalonga'
+        http.get(`http://localhost:8030/herois?skip=0&limit=1000&nome=${NAME}`, (res) => {
+          let data = '';
+          res.on('data', (chunk) => {
+            data += chunk;
+          });
+    
+          res.on('end', () => {
+            const responseBody = JSON.parse(data);
+             for(i = 0; i < responseBody.length; i++) {
+               assert.equal(responseBody[i].nome, NAME)
+             }
+            done();
+          });
+        });
+      });
+
+
+      it('Verificar sem o skip', (done) => {
+        http.get('http://localhost:8030/herois?limit=3', (res) => {
+          let data = '';
+          res.on('data', (chunk) => {
+            data += chunk;
+          });
+    
+          res.on('end', () => {
+            const responseBody = JSON.parse(data);
+            assert.ok(responseBody.length > 1, 'O valor atual nao foi maior que um!')
+            done();
+          });
+        });
+      });
+
+
+
+      it('Verificar sem o limit', (done) => {
+        http.get('http://localhost:8030/herois?skip=0', (res) => {
+          let data = '';
+          res.on('data', (chunk) => {
+            data += chunk;
+          });
+    
+          res.on('end', () => {
+            const responseBody = JSON.parse(data);
+            assert.ok(responseBody.length > 1, 'O valor atual nao foi maior que um!')
+            done();
+          });
+        });
+      });
+
+
+      it('Verificar se nome existe', (done) => {
+        http.get('http://localhost:8030/herois?skip=0&limit=3', (res) => {
+          let data = '';
+          res.on('data', (chunk) => {
+            data += chunk;
+          });
+    
+          res.on('end', () => {
+            const responseBody = JSON.parse(data);
+            const NomeResponseBody = responseBody[0].nome
+            assert.ok(NomeResponseBody != undefined)
+            done();
+          });
+        });
+      });
+
+
+      
+      it('Verificar se poder existe', (done) => {
+        http.get('http://localhost:8030/herois?skip=0&limit=3', (res) => {
+          let data = '';
+          res.on('data', (chunk) => {
+            data += chunk;
+          });
+    
+          res.on('end', () => {
+            const responseBody = JSON.parse(data);
+            const NomeResponseBody = responseBody[0].poder
+            assert.ok(NomeResponseBody != undefined)
+            done();
+          });
+        });
+      });
+
+
+    // it('listar /herois - deve retornar um erro com limit incorreto', async () => {
+    //     const TAMANHO_LIMITE = 'AEEE';
+    //     const result = await app.inject({
+    //         method: 'GET',
+    //         url: `/herois?skip=0&limit=${TAMANHO_LIMITE}`
+    //     });
+    //     assert.equal(result.payload, 'Error interno no servidor');
+    // });
+
+    // it('listar /herois - deve filtrar um item', async () => {
+    //     const NAME = 'Demons';
+    //     const result = await app.inject({
+    //         method: 'GET',
+    //         url: `/herois?skip=0&limit=1000&nome=${NAME}`
+    //     });
+
+    //     const dados = JSON.parse(result.payload);
+    //     const statusCode = result.statusCode;
+    //     assert.equal(statusCode, 200);
+    //     assert.strictEqual(dados[0].nome, NAME);
+    // });
 });

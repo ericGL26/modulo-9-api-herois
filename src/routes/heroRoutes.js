@@ -39,7 +39,7 @@ class HeroRoutes extends BaseRoute {
                     }
 
                     return this.db.read(query, parseInt(skip), parseInt(limit))
-
+                    //return [{heroi: "homem arara"}]
 
                 } catch(error) {
                     console.error('algo deu errado heroroutes linha 16', error)
