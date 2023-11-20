@@ -30,7 +30,6 @@ describe('MongoDB suite de testes', function () {
     })
     it('Verificar conexão', async () => { // Alterado para ser assíncrono
         const result = await context.isConected(); // Corrigido o nome da função
-        console.log('Result', result)
         const expected = 'Conectado'; // Espera que o resultado seja verdadeiro, pois a conexão é bem-sucedida
         assert.equal(result, expected);
     });
@@ -39,14 +38,14 @@ describe('MongoDB suite de testes', function () {
         assert.deepEqual({ nome, poder }, MOCK_HEROI_CADASTRAR)
     })
     it('listar', async () => {
-        const leitura = await context.read()
+        const leitura = await context.read();
     })
     it('atualizar', async () => {
         const result = await context.update(MOCK_HEROI_ID, {
-            nome: 'Pernalonga'
+            id: '653aa37a935e1ad8da7048580932'
         })
     })
     it('remover', async () => {
-        const result = await context.delete(MOCK_HEROI_ID)
+        const result = await context.delete(MOCK_HEROI_ID);
     })
 });

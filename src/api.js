@@ -6,7 +6,6 @@ const MongoDb = require('../db/strategies/mongodb/mongodb');
 const HeroiSchema = require('../db/strategies/mongodb/schemas/heroisSchema');
 const HeroRoute = require('./routes/heroRoutes');
 const HapiPino = require('hapi-pino');
-
 async function main() {
     const connection = await MongoDb.MongoDB.connect();
     const context = new Context(new MongoDb.MongoDB(connection, HeroiSchema));
@@ -19,15 +18,22 @@ async function main() {
     await server.register(HapiPino);
 
     function mapRoutes(instance, methods) {
-        return methods.map(method => instance[method]());
+        return methods.map(method => {
+            const route = instance[method]();
+            return route;
+        });
     }
+    
+    
 
+    
     server.route([
-        ...mapRoutes(new HeroRoute(context), HeroRoute.methods())
+        ...mapRoutes(new HeroRoute(context), HeroRoute.methods()),
+        console.log('TESTANDO ELE', ...mapRoutes(new HeroRoute(context), HeroRoute.methods()))
     ]);
 
+
     await server.start();
-    console.log('Servidor rodando na porta', server.info.port);
 
     return server; // Retorna a instância do servidor Hapi
 }
@@ -45,8 +51,8 @@ async function start() {
 
 // Verificar se o arquivo está sendo executado diretamente (node api.js)
 const app = undefined;
-if (require.main === module) {
-    start();
-}
-
+//if (require.main === module) {
+    //start();
+//}
+start()
 //module.exports = app;
