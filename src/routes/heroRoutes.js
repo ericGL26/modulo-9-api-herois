@@ -51,18 +51,21 @@ class HeroRoutes extends BaseRoute {
         };
     }
 
+//O ERROR: Erro ao iniciar o servidor: AssertError: Cannot set uncompiled validation rules without configuring a validator
+//PROVAVELMENTE ESTÁ NO CREATE
     create() {
         return {
             path: '/herois',
             method: 'POST',
             config: {
                 validate: {
+                    query: Joi.object({
+                        skip: Joi.number().integer().default(0),
+                        limit: Joi.number().integer().default(10),
+                        nome: Joi.string().min(3).max(100)
+                    }),
                     failAction: (request, h, err) => {
                         throw err;
-                    },
-                    payload: {
-                        nome: Joi.string().required().min(3).max(100),
-                        poder: Joi.string().required().min(3).max(100)
                     }
                 }
             },
@@ -76,7 +79,8 @@ class HeroRoutes extends BaseRoute {
                     console.log('result', result);
     
                     return {
-                        message: 'Herói cadastrado com sucesso!'
+                        message: 'Herói cadastrado com sucesso!',
+                        _id: result._id
                     };
                 } catch (error) {
                     console.error('Erro no método create:', error);
@@ -85,8 +89,48 @@ class HeroRoutes extends BaseRoute {
             }
         };
     }
-    
+
+
+    update() {
+        return {
+            path: '/herois/{id}',
+            method: 'PATCH',
+            config: {
+                validate: {
+                    params: {
+                        id: Joi.string().require()
+                    },
+                    payload: {
+                        nome: Joi.string().min(3).max(100),
+                        poder: Joi.string().min(2).max(100)
+                    }
+                }
+            },
+            handler: async (request) => {
+                try{
+                    const {id} = request.params;
+                    const {payload} = request
+
+                    const dadosString = JSON.stringify(payload)
+                    const dados = JSON.parse(dadosString)
+
+                    const result = await this.db.update(id, dados)
+                    console.log('RESULTADO ATUALIZAR', result)
+                    return {
+                        message: 'Heroi atualizado com sucesso!'
+                    }
+
+                }
+                catch(error){
+                    console.error('Deu ruim', error)
+                    return 'Error interno heroRoutes'
+                }
+            }
+        }
+    }
 
 }
+
+
 
 module.exports = HeroRoutes

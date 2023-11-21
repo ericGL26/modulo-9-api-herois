@@ -6,9 +6,42 @@ const MOCK_HEROI_CADASTRAR = {
   poder: 'Marreta Bionica'
 }
 
+const MOCK_HEROI_INICIAL = {
+  nome: 'MACACO QUE BATE PRATO',
+  poder: 'SEGURANCA'
+}
 
-describe.only('Suite de testes da API heroes', function () {
+const options =  {
+  hostname: 'localhost',
+  port: 8030,
+  path: '/herois',
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json',
+  },
+};
 
+
+let MOCK_ID =  ''
+
+describe('Suite de testes da API heroes', function () {
+    this.beforeAll(async () => {
+      const req = http.request(options, (res) => {
+        let data = '';
+      
+        res.on('data', (chunk) => {
+          data += chunk;
+        });
+      
+        res.on('end', () => {
+          const statusCode = res.statusCode;
+          const { message, _id } = JSON.parse(data);
+        })
+      })
+      const dado = JSON.parse(result.payload)
+      MOCK_ID = dado._id
+    }
+    )
     it('Deve retornar uma lista de 3 herois', (done) => {
         http.get('http://localhost:8030/herois?skip=0&limit=3', (res) => {
           let data = '';
@@ -36,7 +69,7 @@ describe.only('Suite de testes da API heroes', function () {
     
           res.on('end', () => {
             const responseBody = JSON.parse(data);
-            assert.equal(responseBody.statusCode, 500)
+            assert.equal(responseBody.statusCode, 400)
             done();
           });
         });
@@ -52,7 +85,7 @@ describe.only('Suite de testes da API heroes', function () {
     
           res.on('end', () => {
             const responseBody = JSON.parse(data);
-            assert.equal(responseBody.statusCode, 500)
+            assert.equal(responseBody.statusCode, 400)
             done();
           });
         });
@@ -146,42 +179,80 @@ describe.only('Suite de testes da API heroes', function () {
       });
 
 
-    // it('listar /herois - deve retornar um erro com limit incorreto', async () => {
-    //     const TAMANHO_LIMITE = 'AEEE';
-    //     const result = await app.inject({
-    //         method: 'GET',
-    //         url: `/herois?skip=0&limit=${TAMANHO_LIMITE}`
-    //     });
-    //     assert.equal(result.payload, 'Error interno no servidor');
-    // });
+    const http = require('http');
+const assert = require('assert');
 
-    // it('listar /herois - deve filtrar um item', async () => {
-    //     const NAME = 'Demons';
-    //     const result = await app.inject({
-    //         method: 'GET',
-    //         url: `/herois?skip=0&limit=1000&nome=${NAME}`
-    //     });
+// Suponha que MOCK_HEROI_CADASTRAR seja um objeto representando o herói a ser cadastrado
 
-    //     const dados = JSON.parse(result.payload);
-    //     const statusCode = result.statusCode;
-    //     assert.equal(statusCode, 200);
-    //     assert.strictEqual(dados[0].nome, NAME);
-    // });
+const MOCK_HEROI_CADASTRAR = {
+  nome: 'Superman',
+  poder: 'Super força',
+};
 
-      it('Cadastrar POST - /herois', async () => {
-        console.log('Teste3')
-        const result = await app.inject({
-          method: 'POST',
-          url: `/herois`,
-          payload: JSON.stringify(MOCK_HEROI_CADASTRAR)
-          });
-          console.log('Teste2')
-          const statusCode = result.statusCode
-          console.log('Teste1')
-          const { message } = JSON.parse(result.payload)
-          console.log('MENSAGEM', message)
-          assert.ok(statusCode === 200)
-          assert.deepEqual(message, "Heroi cadastrado com sucesso!")
+it('Cadastrar POST - /herois', (done) => {
+
+  const req = http.request(options, (res) => {
+    let data = '';
+
+    res.on('data', (chunk) => {
+      data += chunk;
+    });
+
+    res.on('end', () => {
+      const statusCode = res.statusCode;
+      const { message, _id } = JSON.parse(data);
+
+      console.log('MENSAGEM', message);
+
+      assert.ok(statusCode === 200);
+      assert.notDeepStrictEqual(_id, undefined);
+      assert.deepEqual(message, 'Herói cadastrado com sucesso!');
+
+      console.log('Teste concluído');
+      done();
+    });
+  });
+
+  req.on('error', (error) => {
+    console.error('Erro na requisição:', error);
+    done(error);
+  });
+
+  req.write(JSON.stringify(MOCK_HEROI_CADASTRAR));
+  req.end();
+});
+
+  it('Atualizar PATCH - /herois/:id', async () => {
+
+    const _id = MOCK_ID
+    const expected = {
+      poder: 'SUPER SEGURANCA'
+    }
+
+    const optionsParaPATCH = {
+      hostname: 'localhost',
+      port: 8030,
+      path: `/herois/${_id}`,
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      }
+    }
+
+    const req = http.request(optionsParaPATCH, (res) => {
+      let data = '';
+    
+      res.on('data', (chunk) => {
+        data += chunk;
+      });
+    
+      res.on('end', () => {
+        const statusCode = res.statusCode;
+        const { message, _id } = JSON.parse(data);
+        assert.ok(statusCode === 200)
+        assert.deepEqual(message, 'Heroi atualizado com sucesso!')
       })
+    })
+  })
 
 });
