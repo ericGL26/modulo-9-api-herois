@@ -15,6 +15,7 @@ async function main() {
         Hoek.assert(Joi, 'Joi not found');
         const server = new Hapi.Server({
             port: 8030
+            //se estiver retornando um erro de porta já em uso é pq vc ja rodou o codigo e a porta ja está sendo usada
         });
 
         await server.register(HapiPino);
@@ -25,7 +26,7 @@ async function main() {
                 return route;
             });
         }
-
+//ALERTANDO ERROR
         server.route([
             ...mapRoutes(new HeroRoute(context), HeroRoute.methods()),
         ]);

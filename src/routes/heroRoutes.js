@@ -90,7 +90,9 @@ class HeroRoutes extends BaseRoute {
         };
     }
 
+//ERROR NO UPDATE
 
+/*
     update() {
         return {
             path: '/herois/{id}',
@@ -98,7 +100,7 @@ class HeroRoutes extends BaseRoute {
             config: {
                 validate: {
                     params: {
-                        id: Joi.string().require()
+                        id: Joi.string().required()
                     },
                     payload: {
                         nome: Joi.string().min(3).max(100),
@@ -128,7 +130,7 @@ class HeroRoutes extends BaseRoute {
             }
         }
     }
-
+*/
 }
 
 

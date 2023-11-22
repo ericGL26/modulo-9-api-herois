@@ -32,26 +32,26 @@ describe('Suite de testes da API heroes', function () {
         res.on('data', (chunk) => {
           data += chunk;
         });
-      
+
         res.on('end', () => {
           const statusCode = res.statusCode;
           const { message, _id } = JSON.parse(data);
         })
       })
-      const dado = JSON.parse(result.payload)
+      console.log('REAK', req.payload)
+      const dado = JSON.parse(req.payload)
       MOCK_ID = dado._id
-    }
-    )
+    })
     it('Deve retornar uma lista de 3 herois', (done) => {
         http.get('http://localhost:8030/herois?skip=0&limit=3', (res) => {
           let data = '';
           res.on('data', (chunk) => {
             data += chunk;
           });
-    
+          //req.payload é undefined
           res.on('end', () => {
             const responseBody = JSON.parse(data);
-
+            console.log('RESPOSTABODY', responseBody)
             assert.equal(responseBody.length, 3)
             done();
           });
@@ -60,7 +60,7 @@ describe('Suite de testes da API heroes', function () {
 
 
 
-      it('deve retornar um erro com limit incorreto', (done) => {
+      it.only('deve retornar um erro com limit incorreto', (done) => {
         http.get('http://localhost:8030/herois?skip=0&limit=sd', (res) => {
           let data = '';
           res.on('data', (chunk) => {
