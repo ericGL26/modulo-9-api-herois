@@ -21,27 +21,54 @@ const options =  {
   },
 };
 
+const optionsParaGET = {
+    hostname: 'localhost',
+    port: 8030,
+    path: '/herois',
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+}
 
 let MOCK_ID =  ''
 
 describe('Suite de testes da API heroes', function () {
-    this.beforeAll(async () => {
-      const req = http.request(options, (res) => {
+    
+  this.beforeAll(async () => {
+    // Criar uma Promise para aguardar a conclusão da requisição
+    const promise = new Promise((resolve, reject) => {
+      const req = http.request(optionsParaGET, (res) => {
         let data = '';
-      
         res.on('data', (chunk) => {
           data += chunk;
+          console.log('CHUNCK', chunk.toString('utf8'))
         });
-
+        //O erro está na variavel chunk que está retornando internal server error
         res.on('end', () => {
           const statusCode = res.statusCode;
           const { message, _id } = JSON.parse(data);
-        })
-      })
-      console.log('REAK', req.payload)
-      const dado = JSON.parse(req.payload)
-      MOCK_ID = dado._id
-    })
+          MOCK_ID = _id;
+          // Resolver a Promise após a conclusão da requisição
+          resolve();
+        });
+      });
+
+      req.on('error', (error) => {
+        console.error('Erro na requisição:', error);
+        
+        // Rejeitar a Promise em caso de erro
+        reject(error);
+      });
+
+      req.end();
+    });
+
+    // Aguardar a conclusão da Promise antes de prosseguir
+    await promise;
+  });
+
+
     it('Deve retornar uma lista de 3 herois', (done) => {
         http.get('http://localhost:8030/herois?skip=0&limit=3', (res) => {
           let data = '';
@@ -51,7 +78,6 @@ describe('Suite de testes da API heroes', function () {
           //req.payload é undefined
           res.on('end', () => {
             const responseBody = JSON.parse(data);
-            console.log('RESPOSTABODY', responseBody)
             assert.equal(responseBody.length, 3)
             done();
           });
@@ -60,7 +86,7 @@ describe('Suite de testes da API heroes', function () {
 
 
 
-      it.only('deve retornar um erro com limit incorreto', (done) => {
+      it('deve retornar um erro com limit incorreto', (done) => {
         http.get('http://localhost:8030/herois?skip=0&limit=sd', (res) => {
           let data = '';
           res.on('data', (chunk) => {
@@ -184,10 +210,6 @@ const assert = require('assert');
 
 // Suponha que MOCK_HEROI_CADASTRAR seja um objeto representando o herói a ser cadastrado
 
-const MOCK_HEROI_CADASTRAR = {
-  nome: 'Superman',
-  poder: 'Super força',
-};
 
 it('Cadastrar POST - /herois', (done) => {
 
@@ -201,8 +223,6 @@ it('Cadastrar POST - /herois', (done) => {
     res.on('end', () => {
       const statusCode = res.statusCode;
       const { message, _id } = JSON.parse(data);
-
-      console.log('MENSAGEM', message);
 
       assert.ok(statusCode === 200);
       assert.notDeepStrictEqual(_id, undefined);
@@ -222,37 +242,40 @@ it('Cadastrar POST - /herois', (done) => {
   req.end();
 });
 
-  it('Atualizar PATCH - /herois/:id', async () => {
+it('Atualizar PATCH - /herois/:id', (done) => {
+  const _id = MOCK_ID;
+  const expected = {
+    poder: 'SUPER SEGURANCA'
+  }
 
-    const _id = MOCK_ID
-    const expected = {
-      poder: 'SUPER SEGURANCA'
+  const optionsParaPATCH = {
+    hostname: 'localhost',
+    port: 8030,
+    path: `/herois/${_id}`,
+    method: 'PATCH', // Corrigir o método para PATCH
+    headers: {
+      'Content-Type': 'application/json',
     }
+  }
 
-    const optionsParaPATCH = {
-      hostname: 'localhost',
-      port: 8030,
-      path: `/herois/${_id}`,
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      }
-    }
+  const req = http.request(optionsParaPATCH, (res) => {
+    let data = '';
+  
+    res.on('data', (chunk) => {
+      data += chunk;
+    });
 
-    const req = http.request(optionsParaPATCH, (res) => {
-      let data = '';
-    
-      res.on('data', (chunk) => {
-        data += chunk;
-      });
-    
-      res.on('end', () => {
-        const statusCode = res.statusCode;
-        const { message, _id } = JSON.parse(data);
-        assert.ok(statusCode === 200)
-        assert.deepEqual(message, 'Heroi atualizado com sucesso!')
-      })
-    })
-  })
+    res.on('end', () => {
+      const statusCode = res.statusCode;
+      const { message, _id } = JSON.parse(data);
+      assert.ok(statusCode === 200)
+      assert.deepEqual(message, 'Heroi atualizado com sucesso!')
+      done(); // Adicionar a chamada done() para indicar que o teste foi concluído
+    });
+  });
+
+  req.end(JSON.stringify(expected)); // Adicionar os dados para a requisição PATCH
+});
+  
 
 });

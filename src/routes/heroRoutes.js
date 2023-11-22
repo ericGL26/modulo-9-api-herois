@@ -14,7 +14,7 @@ class HeroRoutes extends BaseRoute {
             method: 'GET',
             config: {
                 validate: {
-                    query: Joi.object({
+                    payload: Joi.object({
                         skip: Joi.number().integer().default(0),
                         limit: Joi.number().integer().default(10),
                         nome: Joi.string().min(3).max(100)
@@ -59,7 +59,7 @@ class HeroRoutes extends BaseRoute {
             method: 'POST',
             config: {
                 validate: {
-                    query: Joi.object({
+                    payload: Joi.object({
                         skip: Joi.number().integer().default(0),
                         limit: Joi.number().integer().default(10),
                         nome: Joi.string().min(3).max(100)
@@ -84,7 +84,7 @@ class HeroRoutes extends BaseRoute {
                     };
                 } catch (error) {
                     console.error('Erro no método create:', error);
-                    return h.response({ error: 'Internal server error' }).code(500);
+                    return h.response({ error: 'Internal serverr errror' }).code(500);
                 }
             }
         };
@@ -92,7 +92,7 @@ class HeroRoutes extends BaseRoute {
 
 //ERROR NO UPDATE
 
-/*
+
     update() {
         return {
             path: '/herois/{id}',
@@ -130,7 +130,7 @@ class HeroRoutes extends BaseRoute {
             }
         }
     }
-*/
+
 }
 
 
