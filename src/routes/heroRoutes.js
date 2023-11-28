@@ -6,7 +6,7 @@ class HeroRoutes extends BaseRoute {
         super()
         this.db = db
     }
-
+//Os erros estao nesses metodos
 
     list() {
         return {
@@ -14,7 +14,7 @@ class HeroRoutes extends BaseRoute {
             method: 'GET',
             config: {
                 validate: {
-                    payload: Joi.object({
+                    query: Joi.object({
                         skip: Joi.number().integer().default(0),
                         limit: Joi.number().integer().default(10),
                         nome: Joi.string().min(3).max(100)
@@ -28,19 +28,19 @@ class HeroRoutes extends BaseRoute {
                 try {
                     const { skip, limit, nome } = request.query;
                     let query = {};
-
+    
                     if (nome) {
                         query.nome = nome;
                     }
-
+    
                     if (isNaN(skip)) {
                         throw new Error('O tipo do skip é incorreto');
                     }
-
+    
                     if (isNaN(limit)) {
                         throw new Error('O tipo do limit é incorreto');
                     }
-
+    
                     const result = await this.db.read(query, parseInt(skip), parseInt(limit));
                     return result;
                 } catch (error) {
@@ -51,8 +51,6 @@ class HeroRoutes extends BaseRoute {
         };
     }
 
-//O ERROR: Erro ao iniciar o servidor: AssertError: Cannot set uncompiled validation rules without configuring a validator
-//PROVAVELMENTE ESTÁ NO CREATE
     create() {
         return {
             path: '/herois',
@@ -90,46 +88,45 @@ class HeroRoutes extends BaseRoute {
         };
     }
 
-//ERROR NO UPDATE
 
+update() {
+    return {
+        path: '/herois/{id}',
+        method: 'PATCH',
+        config: {
+            validate: {
+                params: Joi.object({
+                    id: Joi.string().required()
+                }),//.compile(),
+                payload: Joi.object({
+                    nome: Joi.string().min(3).max(100),
+                    poder: Joi.string().min(2).max(100)
+                })//.compile(),
+            }
+        },        
+        handler: async (request) => {
+            try {
+                const { id } = request.params;
+                const { payload } = request;
 
-    update() {
-        return {
-            path: '/herois/{id}',
-            method: 'PATCH',
-            config: {
-                validate: {
-                    params: {
-                        id: Joi.string().required()
-                    },
-                    payload: {
-                        nome: Joi.string().min(3).max(100),
-                        poder: Joi.string().min(2).max(100)
-                    }
-                }
-            },
-            handler: async (request) => {
-                try{
-                    const {id} = request.params;
-                    const {payload} = request
+                const dados = {
+                    nome: payload.nome,
+                    poder: payload.poder
+                };
 
-                    const dadosString = JSON.stringify(payload)
-                    const dados = JSON.parse(dadosString)
+                const result = await this.db.update(id, dados);
+                console.log('RESULTADO ATUALIZAR', result);
+                return {
+                    message: 'Herói atualizado com sucesso!'
+                };
 
-                    const result = await this.db.update(id, dados)
-                    console.log('RESULTADO ATUALIZAR', result)
-                    return {
-                        message: 'Heroi atualizado com sucesso!'
-                    }
-
-                }
-                catch(error){
-                    console.error('Deu ruim', error)
-                    return 'Error interno heroRoutes'
-                }
+            } catch (error) {
+                console.error('Deu ruim', error);
+                return 'Erro interno em heroRoutes';
             }
         }
-    }
+    };
+}
 
 }
 
