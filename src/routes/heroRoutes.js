@@ -70,24 +70,24 @@ class HeroRoutes extends BaseRoute {
     
             handler: async (request, h) => {
                 try {
-                    const { nome, poder } = request.payload;
-                    console.log('Payload:', request.payload); // Adicione este log para verificar o payload recebido
-    
+                    const { nome, poder } = request.payload || {}; // Certifique-se de que request.payload não seja nulo ou indefinido
+                    console.log('Payload:', request.payload);
+            
                     const result = await this.db.create({ nome, poder });
                     console.log('result', result);
-    
+            
                     return {
                         message: 'Herói cadastrado com sucesso!',
                         _id: result._id
                     };
                 } catch (error) {
                     console.error('Erro no método create:', error);
-                    return h.response({ error: 'Internal serverr errror' }).code(500);
+                    return h.response({ error: 'Erro interno no servidor' }).code(500);
                 }
             }
-        };
-    }
 
+        };
+    };
 
 update() {
     return {
@@ -104,27 +104,31 @@ update() {
                 })//.compile(),
             }
         },        
+        
         handler: async (request) => {
             try {
                 const { id } = request.params;
+                console.log('IDID', id);
+        
                 const { payload } = request;
-
+        
                 const dados = {
                     nome: payload.nome,
                     poder: payload.poder
                 };
-
+        
                 const result = await this.db.update(id, dados);
                 console.log('RESULTADO ATUALIZAR', result);
+        
                 return {
                     message: 'Herói atualizado com sucesso!'
                 };
-
             } catch (error) {
-                console.error('Deu ruim', error);
+                console.error('Erro no método update:', error);
                 return 'Erro interno em heroRoutes';
             }
         }
+
     };
 }
 
