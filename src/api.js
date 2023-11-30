@@ -5,8 +5,6 @@ const Context = require('../db/strategies/base/contextStrategy');
 const MongoDb = require('../db/strategies/mongodb/mongodb');
 const HeroiSchema = require('../db/strategies/mongodb/schemas/heroisSchema');
 const HeroRoute = require('./routes/heroRoutes');
-const HapiPino = require('hapi-pino');
-//const pinoPretty = require('pino-pretty');
 
 async function main() {
     try {
@@ -18,12 +16,6 @@ async function main() {
             port: 8030
         });
 
-        // Configurar o pino-pretty separadamente
-
-        await server.register({
-            plugin: HapiPino,
-        });
-
         function mapRoutes(instance, methods) {
             return methods.map(method => {
                 const route = instance[method]();
@@ -32,11 +24,11 @@ async function main() {
         }
 
         const routes = mapRoutes(new HeroRoute(context), HeroRoute.methods());
-        console.log('Rotas mapeadas', routes)
+        console.log('Rotas mapeadas', routes);
+
         server.route([
             ...routes,
         ]);
-        
 
         await server.start();
 
