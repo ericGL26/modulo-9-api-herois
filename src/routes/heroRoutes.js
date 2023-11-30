@@ -108,7 +108,6 @@ update() {
         handler: async (request) => {
             try {
                 const { id } = request.params;
-                console.log('IDID', id);
         
                 const { payload } = request;
         

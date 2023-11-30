@@ -38,18 +38,18 @@ describe('Suite de testes da API heroes', function () {
   this.beforeAll(async () => {
     // Criar uma Promise para aguardar a conclusão da requisição
     const promise = new Promise((resolve, reject) => {
-      const req = http.request(optionsParaGET, (res) => {
+      const req = http.request(optionsParaGET, (resolve) => {
         let data = '';
-        res.on('data', (chunk) => {
+        resolve.on('data', (chunk) => {
           data += chunk;
-          console.log('CHUNCK', chunk.toString('utf8'))
+          //console.log('DADOSDATA', data)
+          //console.log('DADOSCHUNK', chunk)
         });
-        //O erro está na variavel chunk que está retornando internal server error
-        res.on('end', () => {
-          const statusCode = res.statusCode;
+        resolve.on('end', () => {
+          const statusCode = resolve.statusCode;
           const { message, _id } = JSON.parse(data);
           MOCK_ID = _id;
-          // Resolver a Promise após a conclusão da requisição
+          console.log('MOCK_ID_IDID', MOCK_ID)
           resolve();
         });
       });

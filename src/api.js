@@ -24,7 +24,6 @@ async function main() {
         }
 
         const routes = mapRoutes(new HeroRoute(context), HeroRoute.methods());
-        console.log('Rotas mapeadas', routes);
 
         server.route([
             ...routes,
