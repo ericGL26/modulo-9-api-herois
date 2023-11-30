@@ -37,37 +37,38 @@ describe('Suite de testes da API heroes', function () {
     
   this.beforeAll(async () => {
     // Criar uma Promise para aguardar a conclusão da requisição
-    const promise = new Promise((resolve, reject) => {
-      const req = http.request(optionsParaGET, (resolve) => {
+    const promise = new Promise((resolvePromise, reject) => {
+      const req = http.request(optionsParaGET, (res) => {
         let data = '';
-        resolve.on('data', (chunk) => {
+  
+        res.on('data', (chunk) => {
           data += chunk;
-          //console.log('DADOSDATA', data)
-          //console.log('DADOSCHUNK', chunk)
         });
-        resolve.on('end', () => {
-          const statusCode = resolve.statusCode;
+  
+        res.on('end', () => {
+          const statusCode = res.statusCode;
           const { message, _id } = JSON.parse(data);
           MOCK_ID = _id;
-          console.log('MOCK_ID_IDID', MOCK_ID)
-          resolve();
+  
+          // Aqui, usamos resolvePromise em vez de resolve
+          resolvePromise();
         });
       });
-
+  
       req.on('error', (error) => {
         console.error('Erro na requisição:', error);
-        
+  
         // Rejeitar a Promise em caso de erro
         reject(error);
       });
-
+  
       req.end();
     });
-
+  
     // Aguardar a conclusão da Promise antes de prosseguir
     await promise;
   });
-
+  
 
     it('Deve retornar uma lista de 3 herois', (done) => {
         http.get('http://localhost:8030/herois?skip=0&limit=3', (res) => {
