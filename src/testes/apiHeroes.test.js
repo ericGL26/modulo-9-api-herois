@@ -1,10 +1,6 @@
 const assert = require('assert');
 const app = require('../api')
 const http = require('http');
-const MOCK_HEROI_CADASTRAR = {
-  nome: 'Chapolin Corolado',
-  poder: 'Marreta Bionica'
-}
 
 const MOCK_HEROI_INICIAL = {
   nome: 'MACACO QUE BATE PRATO',
@@ -47,10 +43,10 @@ describe('Suite de testes da API heroes', function () {
   
         res.on('end', () => {
           const statusCode = res.statusCode;
-          const { message, _id } = JSON.parse(data);
-          MOCK_ID = _id;
-  
-          // Aqui, usamos resolvePromise em vez de resolve
+          const dataJSON = JSON.parse(data)
+          const _id = dataJSON[1]._id
+          //const { message, _id } = JSON.parse(data);
+          MOCK_ID = _id;  
           resolvePromise();
         });
       });
@@ -206,62 +202,53 @@ describe('Suite de testes da API heroes', function () {
       });
 
 
-    const http = require('http');
+
+const axios = require('axios');
 const assert = require('assert');
 
-// Suponha que MOCK_HEROI_CADASTRAR seja um objeto representando o herói a ser cadastrado
+const MOCK_HEROI_CADASTRAR = {
+  nome: "Chapolin Corolado",
+  poder: "Marreta Bionica"
+};
 
+it('Cadastrar POST - /herois', async () => {
+  try {
+    const response = await axios.post('http://localhost:8030/herois', MOCK_HEROI_CADASTRAR);
 
-it('Cadastrar POST - /herois', (done) => {
+    const { status, data } = response;
+    const { message, _id } = data;
 
-  const req = http.request(options, (res) => {
-    let data = '';
+    assert.strictEqual(status, 200);
+    assert.notStrictEqual(_id, undefined);
+    assert.strictEqual(message, 'Herói cadastrado com sucesso!');
 
-    res.on('data', (chunk) => {
-      data += chunk;
-    });
-
-    res.on('end', () => {
-      const statusCode = res.statusCode;
-      const { message, _id } = JSON.parse(data);
-
-      assert.ok(statusCode === 200);
-      assert.notDeepStrictEqual(_id, undefined);
-      assert.deepEqual(message, 'Herói cadastrado com sucesso!');
-
-      console.log('Teste concluído');
-      done();
-    });
-  });
-
-  req.on('error', (error) => {
-    console.error('Erro na requisição:', error);
-    done(error);
-  });
-
-  req.write(JSON.stringify(MOCK_HEROI_CADASTRAR));
-  req.end();
+    console.log('Teste concluído');
+  } catch (error) {
+    console.error('Erro ao processar a resposta:', error);
+    throw error; // Lance o erro para que o teste falhe
+  }
 });
+
 
 it('Atualizar PATCH - /herois/:id', (done) => {
   const _id = MOCK_ID;
   const expected = {
-    poder: 'SUPER SEGURANCA'
-  }
+    poder: 'SUPER SEGURANCA',
+  };
 
   const optionsParaPATCH = {
     hostname: 'localhost',
     port: 8030,
     path: `/herois/${_id}`,
-    method: 'PATCH', // Corrigir o método para PATCH
+    method: 'PATCH',
     headers: {
       'Content-Type': 'application/json',
-    }
-  }
+    },
+  };
 
   const req = http.request(optionsParaPATCH, (res) => {
     let data = '';
-  
+
     res.on('data', (chunk) => {
       data += chunk;
     });
@@ -269,14 +256,14 @@ it('Atualizar PATCH - /herois/:id', (done) => {
     res.on('end', () => {
       const statusCode = res.statusCode;
       const { message, _id } = JSON.parse(data);
-      assert.ok(statusCode === 200)
-      assert.deepEqual(message, 'Heroi atualizado com sucesso!')
-      done(); // Adicionar a chamada done() para indicar que o teste foi concluído
+      assert.ok(statusCode === 200);
+      assert.deepEqual(message, 'Herói atualizado com sucesso!');
+      done();
     });
   });
 
-  req.end(JSON.stringify(expected)); // Adicionar os dados para a requisição PATCH
+  req.end(JSON.stringify(expected));
 });
-  
+
 
 });
