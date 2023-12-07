@@ -33,7 +33,6 @@ let MOCK_ID =  ''
 describe('Suite de testes da API heroes', function () {
     
   this.beforeAll(async () => {
-    // Criar uma Promise para aguardar a conclusão da requisição
     const promise = new Promise((resolvePromise, reject) => {
       const req = http.request(optionsParaGET, (res) => {
         let data = '';
@@ -46,7 +45,6 @@ describe('Suite de testes da API heroes', function () {
           const statusCode = res.statusCode;
           const dataJSON = JSON.parse(data)
           const _id = dataJSON[1]._id
-          //const { message, _id } = JSON.parse(data);
           MOCK_ID = _id;  
           resolvePromise();
         });
@@ -55,14 +53,12 @@ describe('Suite de testes da API heroes', function () {
       req.on('error', (error) => {
         console.error('Erro na requisição:', error);
   
-        // Rejeitar a Promise em caso de erro
         reject(error);
       });
   
       req.end();
     });
   
-    // Aguardar a conclusão da Promise antes de prosseguir
     await promise;
   });
   
@@ -73,7 +69,6 @@ describe('Suite de testes da API heroes', function () {
           res.on('data', (chunk) => {
             data += chunk;
           });
-          //req.payload é undefined
           res.on('end', () => {
             const responseBody = JSON.parse(data);
             assert.equal(responseBody.length, 3)
@@ -208,8 +203,8 @@ const axios = require('axios');
 const assert = require('assert');
 
 const MOCK_HEROI_CADASTRAR = {
-  nome: "Chapolin Corolado",
-  poder: "Marreta Bionica"
+  nome: "TESTEDOZE",
+  poder: "TESTEDOZEVINTE"
 };
 
 it('Cadastrar POST - /herois', async () => {
@@ -236,7 +231,7 @@ it('Cadastrar POST - /herois', async () => {
 
   } catch (error) {
     console.error('Erro ao processar a resposta:', error);
-    throw error; // Lance o erro para que o teste falhe
+    throw error;
   }
 });
 
@@ -275,6 +270,4 @@ it('Atualizar PATCH - /herois/:id', (done) => {
 
   req.end(JSON.stringify(expected));
 });
-
-
 });
