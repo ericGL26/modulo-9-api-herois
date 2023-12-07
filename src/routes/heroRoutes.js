@@ -60,7 +60,8 @@ class HeroRoutes extends BaseRoute {
                     payload: Joi.object({
                         skip: Joi.number().integer().default(0),
                         limit: Joi.number().integer().default(10),
-                        nome: Joi.string().min(3).max(100)
+                        nome: Joi.string().min(3).max(100),
+                        poder: Joi.string().min(3).max(100)
                     }),
                     failAction: (request, h, err) => {
                         throw err;

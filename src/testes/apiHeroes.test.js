@@ -1,6 +1,7 @@
 const assert = require('assert');
 const app = require('../api')
 const http = require('http');
+const Joi = require('joi');
 
 const MOCK_HEROI_INICIAL = {
   nome: 'MACACO QUE BATE PRATO',
@@ -213,16 +214,26 @@ const MOCK_HEROI_CADASTRAR = {
 
 it('Cadastrar POST - /herois', async () => {
   try {
-    const response = await axios.post('http://localhost:8030/herois', MOCK_HEROI_CADASTRAR);
+    const { error, value: validatedPayload } = Joi.object({
+      skip: Joi.number().integer().default(0),
+      limit: Joi.number().integer().default(10),
+      nome: Joi.string().min(3).max(100),
+      poder: Joi.string().min(3).max(100)
+    }).validate(MOCK_HEROI_CADASTRAR)
 
-    const { status, data } = response;
-    const { message, _id } = data;
+    if(error){
+      throw new Error(`Erro na validacao do payload ${error}`)
+    }
 
-    assert.strictEqual(status, 200);
-    assert.notStrictEqual(_id, undefined);
-    assert.strictEqual(message, 'Herói cadastrado com sucesso!');
+    const response = await axios.post('http://localhost:8030/herois', validatedPayload);
 
-    console.log('Teste concluído');
+    const { status, data } = response
+    const { message, _id } = data
+
+    assert.strictEqual(status, 200)
+    assert.notStrictEqual(_id, undefined)
+    assert.strictEqual(message, 'Herói cadastrado com sucesso!')
+
   } catch (error) {
     console.error('Erro ao processar a resposta:', error);
     throw error; // Lance o erro para que o teste falhe
