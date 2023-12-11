@@ -270,4 +270,42 @@ it('Atualizar PATCH - /herois/:id', (done) => {
 
   req.end(JSON.stringify(expected));
 });
+
+
+
+it('Atualizar PATCH - /herois/:id - não deve atualizar com ID incorreto!', (done) => {
+  const _id = `${MOCK_ID}01`;
+  const expected = {
+    poder: 'SUPER SEGURANCA',
+  };
+
+  const optionsParaPATCH = {
+    hostname: 'localhost',
+    port: 8030,
+    path: `/herois/${_id}`,
+    method: 'PATCH',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  };
+
+  const req = http.request(optionsParaPATCH, (res) => {
+    let data = '';
+
+    res.on('data', (chunk) => {
+      data += chunk;
+    });
+
+    res.on('end', () => {
+      const statusCode = res.statusCode;
+      const { message, _id } = JSON.parse(data);
+      assert.ok(statusCode === 200);
+      assert.deepEqual(message, 'Não foi possivel atualizar!');
+      done();
+    });
+  });
+
+  req.end(JSON.stringify(expected));
+});
+
 });

@@ -71,11 +71,8 @@ class HeroRoutes extends BaseRoute {
     
             handler: async (request, h) => {
                 try {
-                    const { nome, poder } = request.payload || {}; // Certifique-se de que request.payload não seja nulo ou indefinido
-                    console.log('Payload:', request.payload);
-            
+                    const { nome, poder } = request.payload || {}; // Certifique-se de que request.payload não seja nulo ou indefinido            
                     const result = await this.db.create({ nome, poder });
-                    console.log('result', result);
             
                     return {
                         message: 'Herói cadastrado com sucesso!',
@@ -118,8 +115,10 @@ update() {
                 };
         
                 const result = await this.db.update(id, dados);
-                console.log('RESULTADO ATUALIZAR', result);
-        
+                if(result.modifiedCount !== 1) return {
+                    message: 'Não foi possivel atualizar!'
+                }
+                
                 return {
                     message: 'Herói atualizado com sucesso!'
                 };
