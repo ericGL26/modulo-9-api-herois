@@ -237,7 +237,7 @@ it('Cadastrar POST - /herois', async () => {
 
 
 it('Atualizar PATCH - /herois/:id', (done) => {
-  const _id = MOCK_ID;
+  const _id = '653c089c32f279512e2fe10c'//MOCK_ID;
   const expected = {
     poder: 'SUPER SEGURANCA',
   };
@@ -274,7 +274,7 @@ it('Atualizar PATCH - /herois/:id', (done) => {
 
 
 it('Atualizar PATCH - /herois/:id - não deve atualizar com ID incorreto!', (done) => {
-  const _id = `${MOCK_ID}01`;
+  const _id = `5bfdb6e83f66ad3c32939fb1`;
   const expected = {
     poder: 'SUPER SEGURANCA',
   };
