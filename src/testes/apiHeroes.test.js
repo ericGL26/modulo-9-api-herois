@@ -28,26 +28,37 @@ const optionsParaGET = {
     },
 }
 
+
+const optionsParaBeforeAll = {
+  hostname: 'localhost',
+  port: 8030,
+  path: '/herois?limit=10000',
+  method: 'GET',
+  headers: {
+    'Content-Type': 'application/json',
+  },
+}
+
+
 let MOCK_ID =  ''
 
 describe('Suite de testes da API heroes',  function () {
     
   this.beforeAll(async () => {
     const promise = new Promise((resolvePromise, reject) => {
-      const req = http.request(optionsParaGET, (res) => {
+      const req = http.request(optionsParaBeforeAll, (res) => {
         let data = '';
   
         res.on('data', (chunk) => {
           data += chunk;
         });
-  
         res.on('end', () => {
           const statusCode = res.statusCode;
           const dataJSON = JSON.parse(data)
           const ultimoCadastro = dataJSON[dataJSON.length - 1]
-          const _id = ultimoCadastro.id
-          //console.log('ULTIMOCADASTRADO', ultimoCadastro)
-          MOCK_ID = _id;  
+          const _id = ultimoCadastro._id
+          MOCK_ID = _id; 
+          console.log('MOCK_IDMAXT', MOCK_ID) 
           resolvePromise();
         });
       });
@@ -239,7 +250,8 @@ it('Cadastrar POST - /herois', async () => {
 
 
 it('Atualizar PATCH - /herois/:id', (done) => {
-  const _id = '653c0c50c3f90d899b0e0c14';
+  const _id = MOCK_ID;
+  //id está vindo undefined
   const expected = {
     poder: 'SUPER SEGURANCA',
   };
@@ -253,7 +265,6 @@ it('Atualizar PATCH - /herois/:id', (done) => {
       'Content-Type': 'application/json',
     },
   };
-
   const req = http.request(optionsParaPATCH, (res) => {
     let data = '';
 
@@ -265,7 +276,7 @@ it('Atualizar PATCH - /herois/:id', (done) => {
       const statusCode = res.statusCode;
       const { message, _id } = JSON.parse(data);
       assert.ok(statusCode === 200);
-      assert.deepEqual(message, 'Não foi possivel atualizar!');// quando for corrigir modificar para: Herói atualizado com sucesso!
+      assert.deepEqual(message, 'Herói atualizado com sucesso!');// quando for corrigir modificar para: Herói atualizado com sucesso!
       done();
     });
   });
@@ -309,5 +320,11 @@ it('Atualizar PATCH - /herois/:id - não deve atualizar com ID incorreto!', (don
 
   req.end(JSON.stringify(expected));
 });
+
+/*
+it('remover DELETE - /herois/:id', async () => {
+  const _id = MOCK_ID
+})
+*/
 
 });
