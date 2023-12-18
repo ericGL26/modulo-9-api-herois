@@ -1,5 +1,6 @@
 const BaseRoute = require('./base/baseRoute')
 const Joi = require('joi')
+const Boom = require('boom')
 
 class HeroRoutes extends BaseRoute {
     constructor(db){
@@ -45,7 +46,7 @@ class HeroRoutes extends BaseRoute {
                     return result;
                 } catch (error) {
                     console.error('Algo deu errado em HeroRoutes - list', error);
-                    throw h.response('Erro interno no servidor').code(500);
+                    throw Boom.internal()
                 }
             }
         };
@@ -80,7 +81,7 @@ class HeroRoutes extends BaseRoute {
                     };
                 } catch (error) {
                     console.error('Erro no método create:', error);
-                    return h.response({ error: 'Erro interno no servidor' }).code(500);
+                    return Boom.internal
                 }
             }
 
@@ -115,16 +116,14 @@ update() {
                 };
         
                 const result = await this.db.update(id, dados);
-                if(result.modifiedCount !== 1) return {
-                    message: 'Não foi possivel atualizar!'
-                }
+                if(result.modifiedCount !== 1) return Boom.preconditionFailed('Id Não encontrado no banco')
                 
                 return {
                     message: 'Herói atualizado com sucesso!'
                 };
             } catch (error) {
                 console.error('Erro no método update:', error);
-                return 'Erro interno em heroRoutes';
+                return Boom.internal();
             }
         }
 
@@ -148,9 +147,7 @@ delete() {
 
                 const result = await this.db.delete(id);
                 if (result.deletedCount !== 1) {
-                    return {
-                        message: 'Não foi possível remover o item'
-                    };
+                    return Boom.preconditionFailed('Id Não encontrado no banco')
                 }
 
                 return {
@@ -158,7 +155,7 @@ delete() {
                 };
             } catch (error) {
                 console.error('Erro no método delete:', error);
-                return 'Erro interno em heroRoutes';
+                return Boom.internal()
             }
         }
     };

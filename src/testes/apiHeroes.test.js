@@ -306,12 +306,11 @@ it('Atualizar PATCH - /herois/:id - não deve atualizar com ID incorreto!', (don
     res.on('data', (chunk) => {
       data += chunk;
     });
-
     res.on('end', () => {
       const statusCode = res.statusCode;
       const { message, _id } = JSON.parse(data);
-      assert.ok(statusCode === 200);
-      assert.deepEqual(message, 'Não foi possivel atualizar!');
+      assert.ok(statusCode === 412);
+      assert.deepEqual(message, 'Id Não encontrado no banco');
       done();
     });
   });
@@ -322,7 +321,6 @@ it('Atualizar PATCH - /herois/:id - não deve atualizar com ID incorreto!', (don
 
 it('remover DELETE - /herois/:id', async () => {
   const _id = MOCK_ID;
-  console.log('_idMMAXTAM', _id)
   try {
     const response = await axios.delete(`http://localhost:8030/herois/${_id}`);
     const { status, data } = response;
@@ -334,5 +332,47 @@ it('remover DELETE - /herois/:id', async () => {
   }
 });
 
+
+it('remover DELETE - /herois/:id / nao deve remover', async () => {
+  const _id = '5bfdb6e83f66ad3c32939fb1';  // Substitua pelo ID válido que não existe no banco
+
+  try {
+    const response = await axios.delete(`http://localhost:8030/herois/${_id}`);
+    console.log('RESPONSEAASS', response);
+
+    const { status, data } = response;
+    console.log('StatusCOdeNAoDvremover', status);
+
+    // Aqui você pode ajustar as condições de teste conforme necessário
+    assert.ok(status === 404);
+    assert.deepEqual(data.message, 'Id Não encontrado no banco');
+  } catch (error) {
+    // Certifique-se de ajustar as condições de erro conforme necessário
+    assert.ok(error.response.status === 412);
+    assert.deepEqual(error.response.data.message, 'Id Não encontrado no banco');
+  }
+});
+
+
+
+it('remover DELETE - /herois/:id / nao deve remover com id invalido', async () => {
+  const _id = 'ID_INVALIDO';
+
+  try {
+    const response = await axios.delete(`http://localhost:8030/herois/${_id}`);
+    console.log('RESPONSEAASS', response);
+
+    const { status, data } = response;
+    console.log('StatusCOdeNAoDvremover', status);
+
+    // Aqui você pode ajustar as condições de teste conforme necessário
+    assert.ok(status === 500 || status === 404);
+    assert.deepEqual(data.message, 'An internal server error occurred');
+  } catch (error) {
+    // Certifique-se de ajustar as condições de erro conforme necessário
+    assert.ok(error.response.status === 500 || error.response.status === 404);
+    assert.deepEqual(error.response.data.message, 'An internal server error occurred');
+  }
+});
 
 });
