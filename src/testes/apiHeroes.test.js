@@ -58,7 +58,6 @@ describe('Suite de testes da API heroes',  function () {
           const ultimoCadastro = dataJSON[dataJSON.length - 1]
           const _id = ultimoCadastro._id
           MOCK_ID = _id; 
-          console.log('MOCK_IDMAXT', MOCK_ID) 
           resolvePromise();
         });
       });
@@ -251,7 +250,6 @@ it('Cadastrar POST - /herois', async () => {
 
 it('Atualizar PATCH - /herois/:id', (done) => {
   const _id = MOCK_ID;
-  //id está vindo undefined
   const expected = {
     poder: 'SUPER SEGURANCA',
   };
@@ -321,10 +319,20 @@ it('Atualizar PATCH - /herois/:id - não deve atualizar com ID incorreto!', (don
   req.end(JSON.stringify(expected));
 });
 
-/*
+
 it('remover DELETE - /herois/:id', async () => {
-  const _id = MOCK_ID
-})
-*/
+  const _id = MOCK_ID;
+  console.log('_idMMAXTAM', _id)
+  try {
+    const response = await axios.delete(`http://localhost:8030/herois/${_id}`);
+    const { status, data } = response;
+
+    assert.ok(status === 200);
+    assert.deepEqual(data.message, 'Herói removido com sucesso');
+  } catch (error) {
+    throw new Error(error);
+  }
+});
+
 
 });

@@ -95,11 +95,11 @@ update() {
             validate: {
                 params: Joi.object({
                     id: Joi.string().required()
-                }),//.compile(),
+                }),
                 payload: Joi.object({
                     nome: Joi.string().min(3).max(100),
                     poder: Joi.string().min(2).max(100)
-                })//.compile(),
+                })
             }
         },        
         
@@ -130,6 +130,40 @@ update() {
 
     };
 }
+
+delete() {
+    return {
+        path: '/herois/{id}',
+        method: 'DELETE',
+        config: {
+            validate: {
+                params: Joi.object({
+                    id: Joi.string().required()
+                })
+            }
+        },
+        handler: async (request) => {
+            try {
+                const { id } = request.params;
+
+                const result = await this.db.delete(id);
+                if (result.deletedCount !== 1) {
+                    return {
+                        message: 'Não foi possível remover o item'
+                    };
+                }
+
+                return {
+                    message: 'Herói removido com sucesso'
+                };
+            } catch (error) {
+                console.error('Erro no método delete:', error);
+                return 'Erro interno em heroRoutes';
+            }
+        }
+    };
+}
+
 
 }
 
