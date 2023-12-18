@@ -30,7 +30,7 @@ const optionsParaGET = {
 
 let MOCK_ID =  ''
 
-describe('Suite de testes da API heroes', function () {
+describe('Suite de testes da API heroes',  function () {
     
   this.beforeAll(async () => {
     const promise = new Promise((resolvePromise, reject) => {
@@ -39,17 +39,20 @@ describe('Suite de testes da API heroes', function () {
   
         res.on('data', (chunk) => {
           data += chunk;
+          console.log('DATAMAXM', data)
         });
   
         res.on('end', () => {
           const statusCode = res.statusCode;
           const dataJSON = JSON.parse(data)
-          const _id = dataJSON[1]._id
+          const ultimoCadastro = dataJSON[dataJSON.length - 1]
+          const _id = ultimoCadastro.id
+          console.log('ULTIMOCADASTRADO', ultimoCadastro)
           MOCK_ID = _id;  
           resolvePromise();
         });
       });
-  
+      
       req.on('error', (error) => {
         console.error('Erro na requisição:', error);
   
@@ -237,7 +240,8 @@ it('Cadastrar POST - /herois', async () => {
 
 
 it('Atualizar PATCH - /herois/:id', (done) => {
-  const _id = '653c089c32f279512e2fe10c'//MOCK_ID;
+  const _id = MOCK_ID;
+  console.log('_IDKKMAXIMPO', _id)
   const expected = {
     poder: 'SUPER SEGURANCA',
   };
